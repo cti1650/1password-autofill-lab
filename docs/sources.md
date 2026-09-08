@@ -71,12 +71,12 @@ mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `labe
 **裏付けポイント**
 
 - 1Password 社員 1P_Dave「1Password won't fill into fields marked as _type="search"_ if our team hasn't created a specific recipe for a website using that type of field for a login form」 → **5-C（`type=search`）が充填されなかった**ことの公式かつ直接的な裏付け。本ラボの型ゲート説を最も強く支持するソース
-- 投稿者 dalfajk は「カスタムフィールドのラベルをおそらく全種類試したが動かなかった（No, it doesn't work. I tried probably all those kinds of labels.）」と報告。**本ラボの型ゲート説はこの失敗を説明できます** — 対象が `type=search` である以上、どのラベル方式を試しても通らないため。矛盾ではなく、本ラボの発見が外部報告の原因を説明する関係
+- 投稿者 dalfajk は「カスタムフィールドのラベルをおそらく全種類試したが動かなかった（No, it doesn't work. I tried probably all those kinds of labels.）」と報告。対象が `type=search` である以上、ラベルの与え方によらず充填されない。型ゲートの結果と整合する
 
 **矛盾・相違ポイント**
 
-- **`recipe`（サイト個別ルール）の存在**が明示されており、本ラボの結果を任意のサイトへ一般化できないことを意味します。「型ゲートは絶対」ではなく「recipe があれば `type=search` でも充填され得る」
-- 本ラボは 5-C を「無効」と記録していますが、正確には「**recipe がないため無効**」であり、恒久的な仕様上の制限とは限りません
+- **`recipe`（サイト個別ルール）の存在**が明示されている。recipe があれば `type=search` でも充填され得るため、型ゲートは絶対的な制限ではない
+- 5-C の「無効」は「recipe がないため無効」であり、恒久的な仕様上の制限とは限らない
 
 ### [Adding data-1p-ignore dynamically isn't respected（1Password Community, 2025-06-27）](https://www.1password.community/discussions/developers/adding-data-1p-ignore-dynamically-isnt-respected/157845)
 
@@ -88,8 +88,8 @@ mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `labe
 
 **矛盾・相違ポイント**
 
-- この発言は **`data-1p-ignore` の検出タイミング**についての説明であり、「充填先の選定結果までキャッシュされるか」「並べ替えを検知しないか」は明言されていません。本ラボの走査キャッシュ仮説は**この発言からの推論**であり、直接証明されたわけではありません
-- 解析の起点が「ユーザーがフィールドをクリックしたとき」とされている点は、本ラボの前提（ページ読み込み時に走査される）とは厳密には異なります。**`?reverse=1` が有効な検証手段である根拠はやや弱まります** — クリック時点で再解析されるなら、読み込み後の並べ替えも反映される可能性が残るためです。この点は未解決
+- 発言は **`data-1p-ignore` の検出タイミング**についてのものであり、「充填先の選定結果までキャッシュされるか」「並べ替えを検知しないか」は明言されていない。走査キャッシュ仮説はこの発言からの推論
+- 解析の起点が「ユーザーがフィールドをクリックしたとき」とされており、ページ読み込み時に走査されるという前提とは異なる。クリック時点で再解析されるなら読み込み後の並べ替えも反映され得るため、`?reverse=1` が走査キャッシュを回避できるかは未確定
 
 ### [1Password のカスタムフィールドを autofill に利用する（mizdra's blog, 2021-10-05）](https://www.mizdra.net/entry/2021/10/05/004744)
 
@@ -102,9 +102,9 @@ mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `labe
 
 **矛盾・相違ポイント**
 
-- **「部分一致」と報告している点が本ラボと食い違います。** 本ラボは完全一致（`OP_TEST_TOKEN` 同士）しか試していないため、部分一致の可否は未検証です。同記事が正しければ本ラボの一致条件の記述は不完全ということになります
+- **一致条件を「部分一致」と報告している。** 本ラボは完全一致（`OP_TEST_TOKEN` 同士）のみを検証しており、部分一致の可否は未検証
 - **識別手段を 3 つ（`name` / `id` / `label`）に限定している**のに対し、本ラボでは `placeholder` / `title` / `aria-label` / `aria-labelledby` / 近傍可視テキストでも充填されました。2021 年から 2026 年の間の挙動変化か、当時の調査範囲の差か、いずれかです
-- 記事は充填の**選定順序**（複数候補がある場合にどれが選ばれるか）には触れていません。本ラボの主要な未解決論点はカバーされていません
+- 充填の**選定順序**（複数候補がある場合にどれが選ばれるか）には触れていない
 
 ### [Autofill using HTML "id"（1Password Community, 2023-01-12）](https://www.1password.community/1password-at-home-31/autofill-using-html-id-10427)
 
@@ -115,7 +115,7 @@ mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `labe
 
 **矛盾・相違ポイント**
 
-- **「カスタムフィールドではインラインメニューが表示されない。ツールバーの 1Password アイコンから『Autofill』を選ぶ必要がある」**とスタッフが明言。本ラボは Autofill の実行方法を記録していないため、**実行方法によって結果が変わる可能性を排除できていません**
+- **「カスタムフィールドではインラインメニューが表示されない。ツールバーの 1Password アイコンから『Autofill』を選ぶ必要がある」**とスタッフが明言。本ラボは Autofill の実行方法を記録しておらず、実行方法による差は未検証
 - スタッフは HTML `name` 属性や `label` 要素の対応可否については明言を避けており、mizdra 氏の報告や本ラボの 1-B / 2 系の結果を公式に裏付けるものではありません
 
 ### [Autofill of Custom Field（1Password Community, 2025-05-22）](https://www.1password.community/discussions/1password/autofill-of-custom-field/156349)
@@ -157,12 +157,12 @@ mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `labe
 
 ## 突き合わせから追加したいテストケース
 
-外部ソースを踏まえ、以下が未カバーであることが分かりました。
+外部ソースの記述のうち、本ラボで未カバーの項目です。
 
-0. **カスタムフィールドの種別違い**（最優先・コード変更不要） — メール / パスワード / 電話 / 住所 種別の `OP_TEST_TOKEN` を作り、既存の 5 系（`?only=5-A` / `5-D` / `5-E`）を再実行する。詳細は [findings.md の「次に必要な実験」](findings.md#次に必要な実験) を参照
-1. **部分一致** — `name="prefix_OP_TEST_TOKEN_suffix"` のように、カスタムフィールド名を部分文字列として含むケース
-2. **`data-1p-ignore` / `data-op-ignore`** — 一致する識別情報を持ちつつ、この属性で除外されるかを確認するケース
-3. **隠し input 自体への充填** — `style="display:none"` の input に、一致する識別情報を与えたケース
+1. **カスタムフィールドの種別違い**（コード変更不要） — メール / パスワード / 電話 / 住所 種別の `OP_TEST_TOKEN` を作り、既存の 5 系（`?only=5-A` / `5-D` / `5-E`）を再実行する。詳細は [findings.md](findings.md) を参照
+2. **部分一致** — `name="prefix_OP_TEST_TOKEN_suffix"` のように、カスタムフィールド名を部分文字列として含むケース
+3. **`data-1p-ignore` / `data-op-ignore`** — 一致する識別情報を持ちつつ、この属性で除外されるかを確認するケース
+4. **隠し input 自体への充填** — `style="display:none"` の input に、一致する識別情報を与えたケース
 
 ## その他の参考リンク
 
