@@ -115,7 +115,7 @@ mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `labe
 
 **矛盾・相違ポイント**
 
-- **「カスタムフィールドではインラインメニューが表示されない。ツールバーの 1Password アイコンから『Autofill』を選ぶ必要がある」**とスタッフが明言。本ラボは Autofill の実行方法を記録しておらず、実行方法による差は未検証
+- **「カスタムフィールドではインラインメニューが表示されない。ツールバーの 1Password アイコンから『Autofill』を選ぶ必要がある」**とスタッフが明言。本ラボもツールバーのポップアップから実行しており手順は一致する。ショートカットやインラインメニュー経由での差は未検証
 - スタッフは HTML `name` 属性や `label` 要素の対応可否については明言を避けており、mizdra 氏の報告や本ラボの 1-B / 2 系の結果を公式に裏付けるものではありません
 
 ### [Autofill of Custom Field（1Password Community, 2025-05-22）](https://www.1password.community/discussions/1password/autofill-of-custom-field/156349)
