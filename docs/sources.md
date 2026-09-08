@@ -9,11 +9,12 @@
 
 | 本ラボの観測 | 外部ソース | 判定 |
 | --- | --- | :---: |
-| `type=search` は充填されない（5-C、**Text 種別のカスタムフィールド使用時**） | 1Password 社員 1P_Dave（2025-04-15）「1Password won't fill into fields marked as _type="search"_ if our team hasn't created a specific recipe for a website」 | 一致 |
+| `type=search` は充填されない（5-C。対応するカスタムフィールド種別が存在しない） | 1Password 社員 1P_Dave（2025-04-15）「1Password won't fill into fields marked as _type="search"_ if our team hasn't created a specific recipe for a website」 | 一致 |
 | `autocomplete=off` でも充填される（6-C） | 公式開発者ドキュメントはオプトアウト手段として `data-1p-ignore` / `data-op-ignore` を案内。`autocomplete=off` は無効化手段として記載されていない | 一致 |
 | `id` / `name` / `label` で一致（1-A / 1-B / 2 系） | mizdra 氏の検証記事（2021-10-05）が同じ 3 つを挙げている。公式コミュニティでもスタッフが HTML ID による方法を案内（2023-01-12） | 一致 |
 | `aria-label` / `aria-labelledby` が有効（3-A / 3-B） | 公式開発者ドキュメント「When examining a page, 1Password can take advantage of accessibility cues to locate fields」、ARIA 属性でのアノテーションを推奨 | 一致 |
-| `textarea` は充填されない（5-A、**Text 種別のカスタムフィールド使用時**） | 公式コミュニティに「Autocomplete ignores textarea fields」というスレッドが存在し、textarea を text input に変えると動くとの報告（**リンク切れのため本文未確認**） | 概ね一致 |
+| `textarea` は充填されない（5-A、テキスト種別使用時。住所種別は未検証） | 公式コミュニティに「Autocomplete ignores textarea fields」というスレッドが存在し、textarea を text input に変えると動くとの報告（**リンク切れのため本文未確認**） | 概ね一致 |
+| input の `type` に対応する種別のカスタムフィールドが選ばれる（実験 4） | 公式ドキュメント・コミュニティに該当する記述を発見できず | **本ラボで新規確認** |
 | `placeholder` が有効（1-C） | 公式・mizdra 氏いずれも言及なし | **本ラボで新規確認** |
 | 前方の可視テキストが有効（4-A / 4-B）、不可視テキストは無効（4-C / 4-D） | 該当する記述を発見できず | **本ラボで新規確認** |
 | `aria-describedby` は使われない（3-C） | 該当する記述を発見できず | **本ラボで新規確認** |
@@ -38,11 +39,11 @@
 
 mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `label` の値に**部分一致**する場合に充填されると報告しています。本ラボは完全一致しか試していないため、部分一致の可否は未検証です。ただし同記事は「undocumented な機能だったので、正確な仕様は分かりません」と留保を付けています。
 
-**4. 型ゲートは「カスタムフィールドの種別」との対応である可能性が高い**
+**4. 型ゲートは「カスタムフィールドの種別」との対応（検証済み）**
 
-1Password のカスタムフィールドには **テキスト / URL / メール / 住所 / 日付 / ワンタイムパスワード / パスワード / 電話 / サインイン** の種別があります。本ラボは **Text 種別しか使用していない**ため、5 系で得た「`input[type=text]` 以外は充填されない」という結果は Text 種別に限った話です。
+1Password のカスタムフィールドには **テキスト / URL / メール / 住所 / 日付 / ワンタイムパスワード / パスワード / 電話 / サインイン** の種別があります。実験 4 により、**input の `type` に対応する種別のカスタムフィールドが選ばれる**ことが確認されました（`type=email` ↔ メール種別、`type=password` ↔ パスワード種別）。
 
-メール種別なら `input[type=email]`、パスワード種別なら `input[type=password]` に充填される可能性が高く、**未検証**です。1P_Dave の `type=search` に関する発言も「search に対応する種別が存在しないため recipe が必要」と読めば整合します。
+1P_Dave の `type=search` に関する発言は、「search に対応する種別が存在しないため recipe が必要」と読めば整合します。
 
 **5. 隠し input と隠しテキストは別問題**
 
@@ -159,7 +160,7 @@ mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `labe
 
 外部ソースの記述のうち、本ラボで未カバーの項目です。
 
-1. **カスタムフィールドの種別違い**（コード変更不要） — メール / パスワード / 電話 / 住所 種別の `OP_TEST_TOKEN` を作り、既存の 5 系（`?only=5-A` / `5-D` / `5-E`）を再実行する。詳細は [findings.md](findings.md) を参照
+1. **住所種別と textarea**（コード変更不要） — 住所種別の `OP_TEST_TOKEN` を作り `?only=5-A` を実行する。メール / パスワード種別については[実験 4](findings.md) で検証済み
 2. **部分一致** — `name="prefix_OP_TEST_TOKEN_suffix"` のように、カスタムフィールド名を部分文字列として含むケース
 3. **`data-1p-ignore` / `data-op-ignore`** — 一致する識別情報を持ちつつ、この属性で除外されるかを確認するケース
 4. **隠し input 自体への充填** — `style="display:none"` の input に、一致する識別情報を与えたケース
