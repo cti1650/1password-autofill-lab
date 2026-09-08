@@ -9,11 +9,11 @@
 
 | 本ラボの観測 | 外部ソース | 判定 |
 | --- | --- | :---: |
-| `type=search` は充填されない（5-C） | 1Password 社員 1P_Dave（2025-04-15）「1Password won't fill into fields marked as _type="search"_ if our team hasn't created a specific recipe for a website」 | 一致 |
+| `type=search` は充填されない（5-C、**Text 種別のカスタムフィールド使用時**） | 1Password 社員 1P_Dave（2025-04-15）「1Password won't fill into fields marked as _type="search"_ if our team hasn't created a specific recipe for a website」 | 一致 |
 | `autocomplete=off` でも充填される（6-C） | 公式開発者ドキュメントはオプトアウト手段として `data-1p-ignore` / `data-op-ignore` を案内。`autocomplete=off` は無効化手段として記載されていない | 一致 |
 | `id` / `name` / `label` で一致（1-A / 1-B / 2 系） | mizdra 氏の検証記事（2021-10-05）が同じ 3 つを挙げている。公式コミュニティでもスタッフが HTML ID による方法を案内（2023-01-12） | 一致 |
 | `aria-label` / `aria-labelledby` が有効（3-A / 3-B） | 公式開発者ドキュメント「When examining a page, 1Password can take advantage of accessibility cues to locate fields」、ARIA 属性でのアノテーションを推奨 | 一致 |
-| `textarea` は充填されない（5-A） | 公式コミュニティに「Autocomplete ignores textarea fields」というスレッドが存在し、textarea を text input に変えると動くとの報告（**リンク切れのため本文未確認**） | 概ね一致 |
+| `textarea` は充填されない（5-A、**Text 種別のカスタムフィールド使用時**） | 公式コミュニティに「Autocomplete ignores textarea fields」というスレッドが存在し、textarea を text input に変えると動くとの報告（**リンク切れのため本文未確認**） | 概ね一致 |
 | `placeholder` が有効（1-C） | 公式・mizdra 氏いずれも言及なし | **本ラボで新規確認** |
 | 前方の可視テキストが有効（4-A / 4-B）、不可視テキストは無効（4-C / 4-D） | 該当する記述を発見できず | **本ラボで新規確認** |
 | `aria-describedby` は使われない（3-C） | 該当する記述を発見できず | **本ラボで新規確認** |
@@ -38,7 +38,13 @@
 
 mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `label` の値に**部分一致**する場合に充填されると報告しています。本ラボは完全一致しか試していないため、部分一致の可否は未検証です。ただし同記事は「undocumented な機能だったので、正確な仕様は分かりません」と留保を付けています。
 
-**4. 隠し input と隠しテキストは別問題**
+**4. 型ゲートは「カスタムフィールドの種別」との対応である可能性が高い**
+
+1Password のカスタムフィールドには **テキスト / URL / メール / 住所 / 日付 / ワンタイムパスワード / パスワード / 電話 / サインイン** の種別があります。本ラボは **Text 種別しか使用していない**ため、5 系で得た「`input[type=text]` 以外は充填されない」という結果は Text 種別に限った話です。
+
+メール種別なら `input[type=email]`、パスワード種別なら `input[type=password]` に充填される可能性が高く、**未検証**です。1P_Dave の `type=search` に関する発言も「search に対応する種別が存在しないため recipe が必要」と読めば整合します。
+
+**5. 隠し input と隠しテキストは別問題**
 
 公式ドキュメントはパスワード変更フローで `style="display: none;"` の username フィールドを置くことを推奨しており、**隠された input 自体は充填対象になり得ます**。本ラボの 4-C / 4-D は「隠されたテキストを**ラベル情報源**として使うか」を見たもので、論点が異なります。隠し input への充填可否は未検証です。
 
@@ -58,7 +64,7 @@ mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `labe
 - **`placeholder` への言及が一切ない**が、本ラボでは 1-C で有効だった。公式ドキュメントが列挙する識別手段は網羅的ではない
 - 近傍テキスト（2-C / 2-D / 4-A / 4-B）についても記述がない。**正式な関連付けがなくても充填される**という本ラボの発見は、公式ドキュメントの記述範囲を超えている
 - 公式はパスワード変更フローで `style="display: none;"` の username フィールドを置くことを推奨しており、**隠し要素を扱う前提に見える**。一方 4-C / 4-D では隠しテキストが無視された。ただし前者は「隠された**入力欄**」、後者は「隠された**ラベル用テキスト**」で論点が異なるため、直接の矛盾とは言い切れない（隠し input 自体への充填は本ラボ未検証）
-- 充填可能な input type について明示的な記述がない。`type=text` / `type=password` が例示されるのみで、**5 系で判明した型ゲートは文書化されていない**
+- 充填可能な input type について明示的な記述がない。`type=text` / `type=password` が例示されるのみで、**5 系で判明した型ゲートは文書化されていない**。カスタムフィールドの種別と input `type` の対応関係についても記述がなく、公式情報からは確認できない
 
 ### [Request: 1Password support for autofill on input fields with type="search"（1Password Community, 2025-04-15）](https://www.1password.community/discussions/1password/request-1password-support-for-autofill-on-input-fields-with-typesearch/152852)
 
@@ -153,6 +159,7 @@ mizdra 氏の記事は、カスタムフィールド名が `name` / `id` / `labe
 
 外部ソースを踏まえ、以下が未カバーであることが分かりました。
 
+0. **カスタムフィールドの種別違い**（最優先・コード変更不要） — メール / パスワード / 電話 / 住所 種別の `OP_TEST_TOKEN` を作り、既存の 5 系（`?only=5-A` / `5-D` / `5-E`）を再実行する。詳細は [findings.md の「次に必要な実験」](findings.md#次に必要な実験) を参照
 1. **部分一致** — `name="prefix_OP_TEST_TOKEN_suffix"` のように、カスタムフィールド名を部分文字列として含むケース
 2. **`data-1p-ignore` / `data-op-ignore`** — 一致する識別情報を持ちつつ、この属性で除外されるかを確認するケース
 3. **隠し input 自体への充填** — `style="display:none"` の input に、一致する識別情報を与えたケース
