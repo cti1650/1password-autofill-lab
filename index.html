@@ -5,80 +5,101 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>1Password Custom Field Autofill Matching Lab</title>
 <style>
-:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light dark}body{max-width:1180px;margin:32px auto;padding:0 20px;line-height:1.5}h1{margin-bottom:.25rem}.lead{opacity:.8;margin-top:0}.toolbar{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:0;padding:10px 0;background:Canvas;z-index:5;border-bottom:1px solid #8885}button{padding:7px 11px}section{border:1px solid #8886;border-radius:10px;padding:16px;margin:18px 0}.case{display:grid;grid-template-columns:180px minmax(240px,1fr) 1fr;gap:10px;align-items:start;padding:10px 0;border-top:1px dashed #8885}.case:first-of-type{border-top:0}.meta{font-size:.82rem;opacity:.75;word-break:break-all}.field-wrap{padding:6px}.field-wrap input,.field-wrap textarea{width:min(100%,430px);padding:8px;box-sizing:border-box}.result{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;white-space:pre-wrap}.filled{outline:2px solid currentColor}.tooltip{display:inline-block;border-bottom:1px dotted;cursor:help}.css-tip{position:relative}.css-tip .tiptext{display:none;position:absolute;left:0;top:100%;padding:4px 8px;border:1px solid;background:Canvas;z-index:2}.css-tip:hover .tiptext{display:block}@media(max-width:800px){.case{grid-template-columns:1fr}}
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light dark}body{max-width:1180px;margin:32px auto;padding:0 20px;line-height:1.5}h1{margin-bottom:.25rem}.lead{opacity:.8;margin-top:0}.toolbar{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:0;padding:10px 0;background:Canvas;z-index:5;border-bottom:1px solid #8885}button{padding:7px 11px}section{border:1px solid #8886;border-radius:10px;padding:16px;margin:18px 0}.case{display:grid;grid-template-columns:180px minmax(240px,1fr) 1fr;gap:10px;align-items:start;padding:10px 0;border-top:1px dashed #8885}.case:first-of-type{border-top:0}.meta{font-size:.82rem;opacity:.75;word-break:break-all}.field-wrap{padding:6px}.field-wrap input,.field-wrap textarea{width:min(100%,430px);padding:8px;box-sizing:border-box}.result{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;white-space:pre-wrap}.filled{outline:2px solid currentColor}.tooltip{display:inline-block;border-bottom:1px dotted;cursor:help}.css-tip{position:relative}.css-tip .tiptext{display:none;position:absolute;left:0;top:100%;padding:4px 8px;border:1px solid;background:Canvas;z-index:2}.css-tip:hover .tiptext{display:block}#mode{margin:12px 0;padding:10px 12px;border:1px solid #8886;border-radius:8px;font-size:.9rem}#mode ul{columns:3;margin:.5rem 0 0;padding-left:1.2rem}#mode li{break-inside:avoid}.badge{display:inline-block;padding:1px 8px;border:1px solid;border-radius:999px;font-size:.78rem;margin-left:8px}.warn{color:#b00;font-weight:700}@media(max-width:800px){.case{grid-template-columns:1fr}#mode ul{columns:1}}
 </style>
 </head>
 <body>
 <h1>1Password Custom Field Autofill Matching Lab</h1>
 <p class="lead">1Passwordのカスタムフィールド名 <code>OP_TEST_TOKEN</code> と、DOM側の各種識別情報の一致をブラックボックス検証するページです。1Password側に Text カスタムフィールド <strong>OP_TEST_TOKEN</strong> = <strong>FILLED_BY_1PASSWORD</strong> を作成してAutofillしてください。</p>
 <div class="toolbar">
-<button id="scan">結果を再スキャン</button><button id="clear">入力値をクリア</button><button id="reverse">各セクションのDOM順を反転</button><button id="copy">結果JSONをコピー</button>
+<button id="scan">結果を再スキャン</button><button id="clear">入力値をクリア</button><button id="reverse" title="読み込み後にJSで並べ替えるため、1Passwordが読み込み時に構築した索引には反映されない可能性があります。tie-break検証には ?reverse=1 を使ってください。">DOM順を反転（読み込み後）</button><button id="copy">結果JSONをコピー</button>
 </div>
+<div id="mode"></div>
 <div id="summary"></div>
 
 <section data-group="baseline"><h2>0. Baseline / DOM順</h2>
-<div class="case"><b>0-A 最初の通常input</b><div class="field-wrap"><input id="base-a" name="base_a"></div><div class="result"></div></div>
-<div class="case"><b>0-B 2番目の通常input</b><div class="field-wrap"><input id="base-b" name="base_b"></div><div class="result"></div></div>
-<div class="case"><b>0-C 3番目の通常input</b><div class="field-wrap"><input id="base-c" name="base_c"></div><div class="result"></div></div>
+<div class="case" data-case="0-A"><b>0-A 最初の通常input</b><div class="field-wrap"><input id="base-a" name="base_a"></div><div class="result"></div></div>
+<div class="case" data-case="0-B"><b>0-B 2番目の通常input</b><div class="field-wrap"><input id="base-b" name="base_b"></div><div class="result"></div></div>
+<div class="case" data-case="0-C"><b>0-C 3番目の通常input</b><div class="field-wrap"><input id="base-c" name="base_c"></div><div class="result"></div></div>
 </section>
 
 <section data-group="direct"><h2>1. 直接属性</h2>
-<div class="case"><b>1-A id一致</b><div class="field-wrap"><input id="OP_TEST_TOKEN" name="random_id_name"></div><div class="result"></div></div>
-<div class="case"><b>1-B name一致</b><div class="field-wrap"><input id="name-test" name="OP_TEST_TOKEN"></div><div class="result"></div></div>
-<div class="case"><b>1-C placeholder一致</b><div class="field-wrap"><input id="placeholder-test" name="placeholder_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
-<div class="case"><b>1-D title一致</b><div class="field-wrap"><input id="title-test" name="title_test" title="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="1-A"><b>1-A id一致</b><div class="field-wrap"><input id="OP_TEST_TOKEN" name="random_id_name"></div><div class="result"></div></div>
+<div class="case" data-case="1-B"><b>1-B name一致</b><div class="field-wrap"><input id="name-test" name="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="1-C"><b>1-C placeholder一致</b><div class="field-wrap"><input id="placeholder-test" name="placeholder_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="1-D"><b>1-D title一致</b><div class="field-wrap"><input id="title-test" name="title_test" title="OP_TEST_TOKEN"></div><div class="result"></div></div>
 </section>
 
 <section data-group="label"><h2>2. label</h2>
-<div class="case"><b>2-A label for</b><div class="field-wrap"><label for="label-for-test">OP_TEST_TOKEN</label><br><input id="label-for-test" name="label_for_test"></div><div class="result"></div></div>
-<div class="case"><b>2-B label内包</b><div class="field-wrap"><label>OP_TEST_TOKEN<br><input id="label-wrap-test" name="label_wrap_test"></label></div><div class="result"></div></div>
-<div class="case"><b>2-C 関連なしlabel</b><div class="field-wrap"><label>OP_TEST_TOKEN</label><br><input id="label-near-test" name="label_near_test"></div><div class="result"></div></div>
-<div class="case"><b>2-D 壊れたfor</b><div class="field-wrap"><label for="not-existing">OP_TEST_TOKEN</label><br><input id="broken-for-test" name="broken_for_test"></div><div class="result"></div></div>
-<div class="case"><b>2-E 離れたfor</b><div class="field-wrap"><label for="far-label-test">OP_TEST_TOKEN</label><div><div><div style="margin-top:24px"><input id="far-label-test" name="far_label_test"></div></div></div></div><div class="result"></div></div>
+<div class="case" data-case="2-A"><b>2-A label for</b><div class="field-wrap"><label for="label-for-test">OP_TEST_TOKEN</label><br><input id="label-for-test" name="label_for_test"></div><div class="result"></div></div>
+<div class="case" data-case="2-B"><b>2-B label内包</b><div class="field-wrap"><label>OP_TEST_TOKEN<br><input id="label-wrap-test" name="label_wrap_test"></label></div><div class="result"></div></div>
+<div class="case" data-case="2-C"><b>2-C 関連なしlabel</b><div class="field-wrap"><label>OP_TEST_TOKEN</label><br><input id="label-near-test" name="label_near_test"></div><div class="result"></div></div>
+<div class="case" data-case="2-D"><b>2-D 壊れたfor</b><div class="field-wrap"><label for="not-existing">OP_TEST_TOKEN</label><br><input id="broken-for-test" name="broken_for_test"></div><div class="result"></div></div>
+<div class="case" data-case="2-E"><b>2-E 離れたfor</b><div class="field-wrap"><label for="far-label-test">OP_TEST_TOKEN</label><div><div><div style="margin-top:24px"><input id="far-label-test" name="far_label_test"></div></div></div></div><div class="result"></div></div>
 </section>
 
 <section data-group="aria"><h2>3. ARIA</h2>
-<div class="case"><b>3-A aria-label</b><div class="field-wrap"><input id="aria-label-test" name="aria_label_test" aria-label="OP_TEST_TOKEN"></div><div class="result"></div></div>
-<div class="case"><b>3-B aria-labelledby</b><div class="field-wrap"><span id="aria-labelledby-text">OP_TEST_TOKEN</span><br><input id="aria-labelledby-test" name="aria_labelledby_test" aria-labelledby="aria-labelledby-text"></div><div class="result"></div></div>
-<div class="case"><b>3-C aria-describedby</b><div class="field-wrap"><input id="aria-describedby-test" name="aria_describedby_test" aria-describedby="aria-description"><br><span id="aria-description">OP_TEST_TOKEN</span></div><div class="result"></div></div>
+<div class="case" data-case="3-A"><b>3-A aria-label</b><div class="field-wrap"><input id="aria-label-test" name="aria_label_test" aria-label="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="3-B"><b>3-B aria-labelledby</b><div class="field-wrap"><span id="aria-labelledby-text">OP_TEST_TOKEN</span><br><input id="aria-labelledby-test" name="aria_labelledby_test" aria-labelledby="aria-labelledby-text"></div><div class="result"></div></div>
+<div class="case" data-case="3-C"><b>3-C aria-describedby</b><div class="field-wrap"><input id="aria-describedby-test" name="aria_describedby_test" aria-describedby="aria-description"><br><span id="aria-description">OP_TEST_TOKEN</span></div><div class="result"></div></div>
 </section>
 
 <section data-group="nearby"><h2>4. 周辺テキスト / Tooltip</h2>
-<div class="case"><b>4-A span直前</b><div class="field-wrap"><span>OP_TEST_TOKEN</span><br><input id="span-near-test" name="span_near_test"></div><div class="result"></div></div>
-<div class="case"><b>4-B div直前</b><div class="field-wrap"><div>OP_TEST_TOKEN</div><input id="div-near-test" name="div_near_test"></div><div class="result"></div></div>
-<div class="case"><b>4-C CSS tooltip</b><div class="field-wrap css-tip"><span class="tooltip">hover me</span><span class="tiptext">OP_TEST_TOKEN</span><br><input id="css-tooltip-test" name="css_tooltip_test"></div><div class="result"></div></div>
-<div class="case"><b>4-D hidden text</b><div class="field-wrap"><span hidden>OP_TEST_TOKEN</span><input id="hidden-near-test" name="hidden_near_test"></div><div class="result"></div></div>
+<div class="case" data-case="4-A"><b>4-A span直前</b><div class="field-wrap"><span>OP_TEST_TOKEN</span><br><input id="span-near-test" name="span_near_test"></div><div class="result"></div></div>
+<div class="case" data-case="4-B"><b>4-B div直前</b><div class="field-wrap"><div>OP_TEST_TOKEN</div><input id="div-near-test" name="div_near_test"></div><div class="result"></div></div>
+<div class="case" data-case="4-C"><b>4-C CSS tooltip</b><div class="field-wrap css-tip"><span class="tooltip">hover me</span><span class="tiptext">OP_TEST_TOKEN</span><br><input id="css-tooltip-test" name="css_tooltip_test"></div><div class="result"></div></div>
+<div class="case" data-case="4-D"><b>4-D hidden text</b><div class="field-wrap"><span hidden>OP_TEST_TOKEN</span><input id="hidden-near-test" name="hidden_near_test"></div><div class="result"></div></div>
 </section>
 
 <section data-group="types"><h2>5. 要素 / input type</h2>
-<div class="case"><b>5-A textarea placeholder</b><div class="field-wrap"><textarea id="textarea-test" name="textarea_test" placeholder="OP_TEST_TOKEN"></textarea></div><div class="result"></div></div>
-<div class="case"><b>5-B type=text</b><div class="field-wrap"><input type="text" id="type-text-test" name="type_text_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
-<div class="case"><b>5-C type=search</b><div class="field-wrap"><input type="search" id="type-search-test" name="type_search_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
-<div class="case"><b>5-D type=email</b><div class="field-wrap"><input type="email" id="type-email-test" name="type_email_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
-<div class="case"><b>5-E type=password</b><div class="field-wrap"><input type="password" id="type-password-test" name="type_password_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="5-A"><b>5-A textarea placeholder</b><div class="field-wrap"><textarea id="textarea-test" name="textarea_test" placeholder="OP_TEST_TOKEN"></textarea></div><div class="result"></div></div>
+<div class="case" data-case="5-B"><b>5-B type=text</b><div class="field-wrap"><input type="text" id="type-text-test" name="type_text_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="5-C"><b>5-C type=search</b><div class="field-wrap"><input type="search" id="type-search-test" name="type_search_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="5-D"><b>5-D type=email</b><div class="field-wrap"><input type="email" id="type-email-test" name="type_email_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="5-E"><b>5-E type=password</b><div class="field-wrap"><input type="password" id="type-password-test" name="type_password_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
 </section>
 
 <section data-group="forms"><h2>6. form / autocomplete</h2>
-<div class="case"><b>6-A form内</b><div class="field-wrap"><form onsubmit="return false"><input id="in-form-test" name="in_form_test" placeholder="OP_TEST_TOKEN"></form></div><div class="result"></div></div>
-<div class="case"><b>6-B form外</b><div class="field-wrap"><input id="outside-form-test" name="outside_form_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
-<div class="case"><b>6-C autocomplete=off</b><div class="field-wrap"><input id="autocomplete-off-test" name="autocomplete_off_test" autocomplete="off" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
-<div class="case"><b>6-D autocomplete=username</b><div class="field-wrap"><input id="autocomplete-user-test" name="autocomplete_user_test" autocomplete="username" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="6-A"><b>6-A form内</b><div class="field-wrap"><form onsubmit="return false"><input id="in-form-test" name="in_form_test" placeholder="OP_TEST_TOKEN"></form></div><div class="result"></div></div>
+<div class="case" data-case="6-B"><b>6-B form外</b><div class="field-wrap"><input id="outside-form-test" name="outside_form_test" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="6-C"><b>6-C autocomplete=off</b><div class="field-wrap"><input id="autocomplete-off-test" name="autocomplete_off_test" autocomplete="off" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="6-D"><b>6-D autocomplete=username</b><div class="field-wrap"><input id="autocomplete-user-test" name="autocomplete_user_test" autocomplete="username" placeholder="OP_TEST_TOKEN"></div><div class="result"></div></div>
 </section>
 
 <section data-group="duplicates"><h2>7. 完全重複候補（DOM順tie-break）</h2>
-<div class="case"><b>7-A duplicate #1</b><div class="field-wrap"><input id="dup-a" name="dup_a" placeholder="OP_TEST_TOKEN" aria-label="OP_TEST_TOKEN"></div><div class="result"></div></div>
-<div class="case"><b>7-B duplicate #2</b><div class="field-wrap"><input id="dup-b" name="dup_b" placeholder="OP_TEST_TOKEN" aria-label="OP_TEST_TOKEN"></div><div class="result"></div></div>
-<div class="case"><b>7-C duplicate #3</b><div class="field-wrap"><input id="dup-c" name="dup_c" placeholder="OP_TEST_TOKEN" aria-label="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="7-A"><b>7-A duplicate #1</b><div class="field-wrap"><input id="dup-a" name="dup_a" placeholder="OP_TEST_TOKEN" aria-label="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="7-B"><b>7-B duplicate #2</b><div class="field-wrap"><input id="dup-b" name="dup_b" placeholder="OP_TEST_TOKEN" aria-label="OP_TEST_TOKEN"></div><div class="result"></div></div>
+<div class="case" data-case="7-C"><b>7-C duplicate #3</b><div class="field-wrap"><input id="dup-c" name="dup_c" placeholder="OP_TEST_TOKEN" aria-label="OP_TEST_TOKEN"></div><div class="result"></div></div>
 </section>
 
 <script>
+/* モード制御。1Passwordが読み込み時にフィールドを走査するより前に順序と対象を確定させる必要があるため、
+   body末尾のこの位置で同期的に実行する（DOMContentLoadedを待たない）。 */
+const qs=new URLSearchParams(location.search);
+const rawOnly=(qs.get('only')||'').toUpperCase();
+const reverseAtLoad=qs.get('reverse')==='1';
+const allCases=[...document.querySelectorAll('.case')].map(c=>({id:c.dataset.case,label:c.querySelector('b').textContent.trim()}));
+const only=allCases.some(c=>c.id===rawOnly)?rawOnly:'';
+function reverseCases(){document.querySelectorAll('section').forEach(s=>{const cs=[...s.querySelectorAll(':scope > .case')];cs.reverse().forEach(c=>s.appendChild(c))})}
+if(only){document.querySelectorAll('.case').forEach(c=>{if(c.dataset.case!==only)c.remove()});document.querySelectorAll('section').forEach(s=>{if(!s.querySelector('.case'))s.remove()})}
+if(reverseAtLoad)reverseCases();
 const fields=()=>[...document.querySelectorAll('input,textarea')];
-function info(el){return {tag:el.tagName.toLowerCase(),type:el.type||null,id:el.id||null,name:el.name||null,placeholder:el.getAttribute('placeholder'),title:el.getAttribute('title'),ariaLabel:el.getAttribute('aria-label'),ariaLabelledby:el.getAttribute('aria-labelledby'),ariaDescribedby:el.getAttribute('aria-describedby'),autocomplete:el.getAttribute('autocomplete'),labels:el.labels?[...el.labels].map(x=>x.textContent.trim()):[],value:el.value,onePasswordFilled:el.getAttribute('data-com-onepassword-filled'),domIndex:fields().indexOf(el)};}
+function info(el){return {case:el.closest('.case')?.dataset.case||null,tag:el.tagName.toLowerCase(),type:el.type||null,id:el.id||null,name:el.name||null,placeholder:el.getAttribute('placeholder'),title:el.getAttribute('title'),ariaLabel:el.getAttribute('aria-label'),ariaLabelledby:el.getAttribute('aria-labelledby'),ariaDescribedby:el.getAttribute('aria-describedby'),autocomplete:el.getAttribute('autocomplete'),labels:el.labels?[...el.labels].map(x=>x.textContent.trim()):[],value:el.value,onePasswordFilled:el.getAttribute('data-com-onepassword-filled'),domIndex:fields().indexOf(el)};}
 function scan(){let filled=0;document.querySelectorAll('.case').forEach(c=>{const el=c.querySelector('input,textarea');if(!el)return;const d=info(el);const hit=!!d.onePasswordFilled||d.value==='FILLED_BY_1PASSWORD';c.classList.toggle('filled',hit);if(hit)filled++;c.querySelector('.result').textContent=JSON.stringify(d,null,2)});document.querySelector('#summary').innerHTML=`<p><strong>検出:</strong> ${filled} フィールド / ${fields().length}。Autofill後に「結果を再スキャン」を押してください。</p>`;}
+const base=location.href.split('#')[0].split('?')[0];
+const modeUrl=(o,r)=>{const p=new URLSearchParams();if(o)p.set('only',o);if(r)p.set('reverse','1');const q=p.toString();return base+(q?'?'+q:'')};
+function renderMode(){
+const bad=rawOnly&&!only?`<div class="warn">指定された only=${rawOnly} は存在しないケースIDです。全ケースを表示しています。</div>`:'';
+const cur=only?`単独モード: <strong>${only}</strong>（他のケースはDOMから除去済み）`:`全ケース表示（${allCases.length}件）`;
+const links=allCases.map(c=>`<li><a href="${modeUrl(c.id,reverseAtLoad)}">${c.label}</a></li>`).join('');
+document.querySelector('#mode').innerHTML=`${bad}<div>${cur}<span class="badge">読み込み時反転: ${reverseAtLoad?'ON':'OFF'}</span></div>
+<div style="margin-top:6px"><a href="${modeUrl('',reverseAtLoad)}">全ケースに戻る</a> ｜ <a href="${modeUrl(only,!reverseAtLoad)}">読み込み時反転を${reverseAtLoad?'OFF':'ON'}にする</a></div>
+<details style="margin-top:6px"><summary>1ケースだけを残して開く</summary><ul>${links}</ul></details>`;}
+renderMode();
 document.querySelector('#scan').onclick=scan;
 document.querySelector('#clear').onclick=()=>{fields().forEach(e=>{e.value='';e.removeAttribute('data-com-onepassword-filled')});scan()};
-document.querySelector('#reverse').onclick=()=>{document.querySelectorAll('section').forEach(s=>{const cs=[...s.querySelectorAll(':scope > .case')];cs.reverse().forEach(c=>s.appendChild(c))});scan()};
-document.querySelector('#copy').onclick=async()=>{const out=fields().map(info);await navigator.clipboard.writeText(JSON.stringify(out,null,2));alert('結果JSONをコピーしました')};
+document.querySelector('#reverse').onclick=()=>{reverseCases();scan()};
+document.querySelector('#copy').onclick=async()=>{const text=JSON.stringify({mode:{only:only||null,reverseAtLoad},userAgent:navigator.userAgent,fields:fields().map(info)},null,2);try{await navigator.clipboard.writeText(text);alert('結果JSONをコピーしました')}catch{console.log(text);alert('クリップボードに書き込めませんでした（file://等の非セキュアコンテキスト）。コンソールに出力しました。')}};
 new MutationObserver(scan).observe(document.body,{subtree:true,attributes:true,attributeFilter:['data-com-onepassword-filled']});
 fields().forEach(e=>e.addEventListener('input',scan));scan();
 </script>
