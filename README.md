@@ -155,7 +155,7 @@ JSON に含まれないため、別途記録しておくと有用な条件:
 
 - **本プロジェクトは非公式であり、AgileBits / 1Password とは一切関係ありません。** 1Password は AgileBits Inc. の商標です
 - 本リポジトリは外形的な挙動を観察するためのページであり、公式な仕様を示すものではありません。挙動はバージョンによって変わり得ます
-- **記録済みの結果は検証環境が未記録です。** 再現性は保証されません（[docs/findings.md](docs/findings.md#検証環境) 参照）
+- 記録済みの結果は **1Password for Mac 8.12.33 / Chrome 152 / macOS 15.5** での単発の観測です（[docs/findings.md](docs/findings.md#検証環境) 参照）
 - **サイト個別の recipe により挙動が上書きされる場合があります**（[docs/sources.md](docs/sources.md#外部ソースから判明した重要な但し書き) 参照）。本ラボの結果は recipe のないページでの既定挙動です
 - `FILLED_BY_1PASSWORD` はダミー値です。実際の認証情報をカスタムフィールドに入れて検証しないでください
 
